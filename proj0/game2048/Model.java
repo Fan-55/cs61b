@@ -94,7 +94,7 @@ public class Model extends Observable {
         setChanged();
     }
 
-    /** Tilt the board toward SIDE. Return true iff this changes the board.
+    /** Tilt the board toward SIDE. Return true if this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
      *    the same value, they are merged into one Tile of twice the original
@@ -113,10 +113,66 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        if (side != Side.NORTH) {
+            this.board.setViewingPerspective(side);
+        }
+
+        for (int col = 0; col < this.board.size(); col += 1) {
+            for (int row = this.board.size() - 1; row >= 0; row -=1) {
+                Tile checkedTile = this.board.tile(col, row);
+                if (checkedTile != null) {
+                    continue;
+                }
+                int checkedRowIndex = row;
+                while (checkedTile == null && checkedRowIndex > 0) {
+                    checkedRowIndex -= 1;
+                    checkedTile = this.board.tile(col, checkedRowIndex);
+                }
+                if (checkedTile != null) {
+                    this.board.move(col, row, checkedTile);
+                    changed = true;
+                }
+            }
+
+            for (int row = this.board.size() - 2; row >= 0; row -= 1) {
+                Tile currentTile = this.board.tile(col, row);
+                if (currentTile == null) {
+                    break;
+                }
+                Tile aboveTile = this.board.tile(col, row + 1);
+                if (isSameValue(currentTile, aboveTile)) {
+                    this.score += currentTile.value() * 2;
+                    this.board.move(col, row + 1, currentTile);
+                    fillGaps(col);
+                    changed = true;
+                }
+            }
+        }
 
         checkGameOver();
         if (changed) {
             setChanged();
+        }
+        this.board.setViewingPerspective(Side.NORTH);
+        return changed;
+    }
+
+    private boolean fillGaps (int col) {
+        boolean changed = false;
+        for (int row = this.board.size() - 1; row >= 0; row -=1) {
+            Tile checkedTile = this.board.tile(col, row);
+            if (checkedTile != null) {
+                continue;
+            }
+            int checkedRowIndex = row;
+            while (checkedTile == null && checkedRowIndex > 0) {
+                checkedRowIndex -= 1;
+                checkedTile = this.board.tile(col, checkedRowIndex);
+            }
+            if (checkedTile != null) {
+                this.board.move(col, row, checkedTile);
+                changed = true;
+            }
         }
         return changed;
     }
@@ -137,7 +193,15 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                boolean isEmptyTile = b.tile(col, row) == null;
+                if (isEmptyTile) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -147,7 +211,16 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                Tile checkedTile = b.tile(col,row);
+                boolean hasMaxTile = checkedTile != null && checkedTile.value() == MAX_PIECE;
+                if (hasMaxTile) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -158,10 +231,28 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0; col < size; col += 1) {
+            for (int row = 0; row < size; row += 1) {
+                Tile checkedTile = b.tile(col, row);
+                if (checkedTile == null) return true;
+                if (col + 1 < size) {
+                    Tile rightTile = b.tile(col + 1, row);
+                    if (isSameValue(checkedTile, rightTile)) return true;
+                }
+                if (row + 1 < size) {
+                    Tile aboveTile = b.tile(col, row + 1);
+                    if (isSameValue(checkedTile, aboveTile)) return true;
+                }
+            }
+        }
         return false;
     }
 
+    private static boolean isSameValue(Tile t1, Tile t2) {
+        if (t1 == null || t2 == null) return false;
+        return t1.value() == t2.value();
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
