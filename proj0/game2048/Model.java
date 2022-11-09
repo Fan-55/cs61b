@@ -94,7 +94,7 @@ public class Model extends Observable {
         setChanged();
     }
 
-    /** Tilt the board toward SIDE. Return true iff this changes the board.
+    /** Tilt the board toward SIDE. Return true if this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
      *    the same value, they are merged into one Tile of twice the original
@@ -113,10 +113,66 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        if (side != Side.NORTH) {
+            this.board.setViewingPerspective(side);
+        }
+
+        for (int col = 0; col < this.board.size(); col += 1) {
+            for (int row = this.board.size() - 1; row >= 0; row -=1) {
+                Tile checkedTile = this.board.tile(col, row);
+                if (checkedTile != null) {
+                    continue;
+                }
+                int checkedRowIndex = row;
+                while (checkedTile == null && checkedRowIndex > 0) {
+                    checkedRowIndex -= 1;
+                    checkedTile = this.board.tile(col, checkedRowIndex);
+                }
+                if (checkedTile != null) {
+                    this.board.move(col, row, checkedTile);
+                    changed = true;
+                }
+            }
+
+            for (int row = this.board.size() - 2; row >= 0; row -= 1) {
+                Tile currentTile = this.board.tile(col, row);
+                if (currentTile == null) {
+                    break;
+                }
+                Tile aboveTile = this.board.tile(col, row + 1);
+                if (isSameValue(currentTile, aboveTile)) {
+                    this.score += currentTile.value() * 2;
+                    this.board.move(col, row + 1, currentTile);
+                    fillGaps(col);
+                    changed = true;
+                }
+            }
+        }
 
         checkGameOver();
         if (changed) {
             setChanged();
+        }
+        this.board.setViewingPerspective(Side.NORTH);
+        return changed;
+    }
+
+    private boolean fillGaps (int col) {
+        boolean changed = false;
+        for (int row = this.board.size() - 1; row >= 0; row -=1) {
+            Tile checkedTile = this.board.tile(col, row);
+            if (checkedTile != null) {
+                continue;
+            }
+            int checkedRowIndex = row;
+            while (checkedTile == null && checkedRowIndex > 0) {
+                checkedRowIndex -= 1;
+                checkedTile = this.board.tile(col, checkedRowIndex);
+            }
+            if (checkedTile != null) {
+                this.board.move(col, row, checkedTile);
+                changed = true;
+            }
         }
         return changed;
     }
@@ -182,10 +238,12 @@ public class Model extends Observable {
                 if (checkedTile == null) return true;
                 if (col + 1 < size) {
                     Tile rightTile = b.tile(col + 1, row);
+                    if (rightTile == null) return true;
                     if (isSameValue(checkedTile, rightTile)) return true;
                 }
                 if (row + 1 < size) {
                     Tile aboveTile = b.tile(col, row + 1);
+                    if (aboveTile == null) return true;
                     if (isSameValue(checkedTile, aboveTile)) return true;
                 }
             }
