@@ -238,12 +238,10 @@ public class Model extends Observable {
                 if (checkedTile == null) return true;
                 if (col + 1 < size) {
                     Tile rightTile = b.tile(col + 1, row);
-                    if (rightTile == null) return true;
                     if (isSameValue(checkedTile, rightTile)) return true;
                 }
                 if (row + 1 < size) {
                     Tile aboveTile = b.tile(col, row + 1);
-                    if (aboveTile == null) return true;
                     if (isSameValue(checkedTile, aboveTile)) return true;
                 }
             }
@@ -252,6 +250,7 @@ public class Model extends Observable {
     }
 
     private static boolean isSameValue(Tile t1, Tile t2) {
+        if (t1 == null || t2 == null) return false;
         return t1.value() == t2.value();
     }
 
