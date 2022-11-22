@@ -4,6 +4,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class SquarePrimesTest {
+    @Test
+    public void testSquarePrimes1() {
+        IntList lst = IntList.of(0, 1, 2, 3, 4);
+        boolean changed = IntListExercises.squarePrimes(lst);
+        assertEquals("0 -> 1 -> 4 -> 9 -> 4", lst.toString());
+        assertTrue(changed);
+    }
 
     /**
      * Here is a test for isPrime method. Try running it.
