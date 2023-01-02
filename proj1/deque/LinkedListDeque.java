@@ -49,6 +49,30 @@ public class LinkedListDeque<T> implements Iterable<T> {
         return new LinkedListDequeIterator();
     }
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof LinkedListDeque otherLLD) {
+            if (this.size != otherLLD.size) {
+                return false;
+            }
+            for (T item : this) {
+                if (!otherLLD.contains(item)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean contains(T x) {
+        for (T itemInList : this) {
+            if (itemInList.equals(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void addFirst(T item) {
         if (size <= 0) {
