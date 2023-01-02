@@ -5,7 +5,9 @@ package deque;
 // 2. Sentinel.prev points to the last node in the list
 // 3. last node.next points to the sentinel
 
-public class LinkedListDeque<T> {
+import java.util.Iterator;
+
+public class LinkedListDeque<T> implements Iterable<T> {
     private static class Node<T> {
         Node<T> prev;
         T item;
@@ -18,11 +20,33 @@ public class LinkedListDeque<T> {
         }
     }
 
+    private class LinkedListDequeIterator implements Iterator<T> {
+        private int pos;
+
+        public LinkedListDequeIterator() {
+            this.pos = 0;
+        }
+
+        public boolean hasNext() {
+            return pos < size;
+        }
+
+        public T next() {
+            T nextItem = get(pos);
+            pos++;
+            return nextItem;
+        }
+    }
+
     private int size = 0;
     private Node<T> sentinel;
 
     public LinkedListDeque() {
         sentinel = new Node<>(null, null, null);
+    }
+
+    public Iterator<T> iterator() {
+        return new LinkedListDequeIterator();
     }
 
 
