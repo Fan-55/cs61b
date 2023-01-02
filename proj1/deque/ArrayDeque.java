@@ -19,8 +19,7 @@ public class ArrayDeque<T> {
         nextFirst = 4;
         nextLast = 5;
     }
-
-
+    
     private void resize() {
         T[] resizedItems = (T[]) new Object[items.length * 2];
         int indexForCopying = getIndexOfFirstItem();
@@ -79,6 +78,10 @@ public class ArrayDeque<T> {
 
     public boolean isEmpty() {
         return size <= 0;
+    }
+
+    public int size() {
+        return this.size;
     }
 
     public void printDeque() {
