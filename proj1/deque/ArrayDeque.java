@@ -14,7 +14,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Comparable<T> {
+public class ArrayDeque<T> implements Iterable<T> {
     private T[] items;
     private int size;
     private int nextLast;
@@ -152,6 +152,7 @@ public class ArrayDeque<T> implements Comparable<T> {
         }
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
