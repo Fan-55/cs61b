@@ -27,10 +27,12 @@ public class LinkedListDeque<T> implements Iterable<T> {
             this.pos = 0;
         }
 
+        @Override
         public boolean hasNext() {
             return pos < size;
         }
 
+        @Override
         public T next() {
             T nextItem = get(pos);
             pos++;
@@ -45,6 +47,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
         sentinel = new Node<>(null, null, null);
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
