@@ -12,7 +12,9 @@ package deque;
 // 6. getIndexOfLastItem: The last item is at position (nextLast - 1), except that the last item is at the end of the
 // items array if nextLast equals 0.
 
-public class ArrayDeque<T> {
+import java.util.Iterator;
+
+public class ArrayDeque<T> implements Comparable<T> {
     private T[] items;
     private int size;
     private int nextLast;
@@ -132,5 +134,25 @@ public class ArrayDeque<T> {
             }
         }
         System.out.println();
+    }
+
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int pos = 0;
+
+        @Override
+        public boolean hasNext() {
+            return pos < size;
+        }
+
+        @Override
+        public T next() {
+            T nextItem = get(pos);
+            pos++;
+            return nextItem;
+        }
+    }
+
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
     }
 }
