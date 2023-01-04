@@ -47,10 +47,11 @@ public class ArrayDeque<T> {
 
     public void addLast(T item) {
         if (size == items.length) {
-            resize();
+            resize(true);
         }
         items[nextLast] = item;
-        if (nextLast + 1 == items.length) {
+        boolean meetTheEndOfItemsArray = nextLast == items.length - 1;
+        if (meetTheEndOfItemsArray) {
             nextLast = 0;
         } else {
             nextLast++;
@@ -60,10 +61,11 @@ public class ArrayDeque<T> {
 
     public void addFirst(T item) {
         if (size == items.length) {
-            resize();
+            resize(true);
         }
         items[nextFirst] = item;
-        if (nextFirst == 0) {
+        boolean meetTheStartOfItemsArray = nextFirst == 0;
+        if (meetTheStartOfItemsArray) {
             nextFirst = items.length - 1;
         } else {
             nextFirst--;
