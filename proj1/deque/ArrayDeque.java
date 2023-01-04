@@ -156,4 +156,23 @@ public class ArrayDeque<T> implements Iterable<T> {
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ArrayDeque otherAD) {
+            if (this.size != otherAD.size) return false;
+            for (T item : this) {
+                if (!otherAD.contains(item)) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean contains(T x) {
+        for (T item : this) {
+            if (item.equals(x)) return true;
+        }
+        return false;
+    }
 }
