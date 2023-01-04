@@ -38,13 +38,11 @@ public class ArrayDeque<T> {
     }
 
     private int getIndexOfFirstItem() {
-        int indexOfFirstItem;
-        if (nextFirst == items.length - 1) {
-            indexOfFirstItem = 0;
-        } else {
-            indexOfFirstItem = nextFirst + 1;
-        }
-        return indexOfFirstItem;
+        return nextFirst == items.length - 1 ? 0 : nextFirst + 1;
+    }
+
+    private int getIndexOfLastItem() {
+        return nextLast == 0 ? items.length - 1 : nextLast - 1;
     }
 
     public void addLast(T item) {
