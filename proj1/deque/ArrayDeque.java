@@ -19,11 +19,12 @@ public class ArrayDeque<T> {
         nextFirst = 4;
         nextLast = 5;
     }
-    
-    private void resize() {
-        T[] resizedItems = (T[]) new Object[items.length * 2];
+
+    private void resize(boolean scaleUp) {
+        int newSize = scaleUp ? items.length * 2 : items.length / 2;
+        T[] resizedItems = (T[]) new Object[newSize];
         int indexForCopying = getIndexOfFirstItem();
-        for (int i = 0; i < items.length; i++) {
+        for (int i = 0; i < size; i++) {
             resizedItems[i] = items[indexForCopying];
             if (indexForCopying + 1 == items.length) {
                 indexForCopying = 0;
@@ -32,7 +33,7 @@ public class ArrayDeque<T> {
             }
         }
         nextFirst = resizedItems.length - 1;
-        nextLast = items.length;
+        nextLast = scaleUp ? items.length : size;
         items = resizedItems;
     }
 
@@ -70,6 +71,37 @@ public class ArrayDeque<T> {
             nextFirst--;
         }
         size++;
+    }
+
+    public T removeLast() {
+        if (size > 0) {
+            double usageFactor = (double) (size - 1) / items.length;
+            if (usageFactor < 0.25) {
+                resize(false);
+            }
+            int indexOfLastItem = getIndexOfLastItem();
+            T lastItem = items[indexOfLastItem];
+            items[indexOfLastItem] = null;
+            nextLast = indexOfLastItem;
+            size--;
+            return lastItem;
+        }
+        return null;
+    }
+
+    public T removeFirst() {
+        if (size > 0) {
+            double usageFactor = (double) (size - 1) / items.length;
+            if (usageFactor < 0.25) {
+                resize(false);
+            }
+            int indexOfFirstItem = getIndexOfFirstItem();
+            T firstItem = items[indexOfFirstItem];
+            nextFirst = indexOfFirstItem;
+            size--;
+            return firstItem;
+        }
+        return null;
     }
 
     public T get(int index) {
