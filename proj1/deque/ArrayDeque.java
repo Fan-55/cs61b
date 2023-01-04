@@ -4,8 +4,13 @@ package deque;
 // 1. size: The number of items in the list should be size.
 // 2. addLast: The item will go to position nextLast.
 // 3. addFirst: The item will go to position nextFirst.
-// 3. resize: double the size of items array and copy from the first item which is at position (nextFirst + 1) if the
-// nextFirst is not the last item in the array. Otherwise, first item is at position 0.
+// 4. resize: Double the size of items array if scaleUp is true. Otherwise, divide the size of items by 2. Copy the and
+// paste the items to the start of new items array. Reassign nextFirst to the last position of new array and nextLast to
+// the position next to the last non-empty element.
+// 5. getIndexOfFirstItem: The first item is at position (nextFirst + 1), except that the first item is at position 0 if
+// the nextFirst equals (items.length - 1).
+// 6. getIndexOfLastItem: The last item is at position (nextLast - 1), except that the last item is at the end of the
+// items array if nextLast equals 0.
 
 public class ArrayDeque<T> {
     private T[] items;
