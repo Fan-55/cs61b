@@ -14,165 +14,169 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Iterable<T> {
-    private T[] items;
-    private int size;
-    private int nextLast;
-    private int nextFirst;
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
+  private T[] items;
+  private int size;
+  private int nextLast;
+  private int nextFirst;
 
-    public ArrayDeque() {
-        items = (T[]) new Object[8];
-        size = 0;
-        nextFirst = 4;
-        nextLast = 5;
+  public ArrayDeque() {
+    items = (T[]) new Object[8];
+    size = 0;
+    nextFirst = 4;
+    nextLast = 5;
+  }
+
+  private void resize(boolean scaleUp) {
+    int newSize = scaleUp ? items.length * 2 : items.length / 2;
+    T[] resizedItems = (T[]) new Object[newSize];
+    int indexForCopying = getIndexOfFirstItem();
+    for (int i = 0; i < size; i++) {
+      resizedItems[i] = items[indexForCopying];
+      if (indexForCopying + 1 == items.length) {
+        indexForCopying = 0;
+      } else {
+        indexForCopying++;
+      }
     }
+    nextFirst = resizedItems.length - 1;
+    nextLast = scaleUp ? items.length : size;
+    items = resizedItems;
+  }
 
-    private void resize(boolean scaleUp) {
-        int newSize = scaleUp ? items.length * 2 : items.length / 2;
-        T[] resizedItems = (T[]) new Object[newSize];
-        int indexForCopying = getIndexOfFirstItem();
-        for (int i = 0; i < size; i++) {
-            resizedItems[i] = items[indexForCopying];
-            if (indexForCopying + 1 == items.length) {
-                indexForCopying = 0;
-            } else {
-                indexForCopying++;
-            }
-        }
-        nextFirst = resizedItems.length - 1;
-        nextLast = scaleUp ? items.length : size;
-        items = resizedItems;
+  private int getIndexOfFirstItem() {
+    return nextFirst == items.length - 1 ? 0 : nextFirst + 1;
+  }
+
+  private int getIndexOfLastItem() {
+    return nextLast == 0 ? items.length - 1 : nextLast - 1;
+  }
+
+  @Override
+  public void addLast(T item) {
+    if (size == items.length) {
+      resize(true);
     }
-
-    private int getIndexOfFirstItem() {
-        return nextFirst == items.length - 1 ? 0 : nextFirst + 1;
+    items[nextLast] = item;
+    boolean meetTheEndOfItemsArray = nextLast == items.length - 1;
+    if (meetTheEndOfItemsArray) {
+      nextLast = 0;
+    } else {
+      nextLast++;
     }
+    size++;
+  }
 
-    private int getIndexOfLastItem() {
-        return nextLast == 0 ? items.length - 1 : nextLast - 1;
+  @Override
+  public void addFirst(T item) {
+    if (size == items.length) {
+      resize(true);
     }
-
-    public void addLast(T item) {
-        if (size == items.length) {
-            resize(true);
-        }
-        items[nextLast] = item;
-        boolean meetTheEndOfItemsArray = nextLast == items.length - 1;
-        if (meetTheEndOfItemsArray) {
-            nextLast = 0;
-        } else {
-            nextLast++;
-        }
-        size++;
+    items[nextFirst] = item;
+    boolean meetTheStartOfItemsArray = nextFirst == 0;
+    if (meetTheStartOfItemsArray) {
+      nextFirst = items.length - 1;
+    } else {
+      nextFirst--;
     }
+    size++;
+  }
 
-    public void addFirst(T item) {
-        if (size == items.length) {
-            resize(true);
-        }
-        items[nextFirst] = item;
-        boolean meetTheStartOfItemsArray = nextFirst == 0;
-        if (meetTheStartOfItemsArray) {
-            nextFirst = items.length - 1;
-        } else {
-            nextFirst--;
-        }
-        size++;
+  @Override
+  public T removeLast() {
+    if (size > 0) {
+      double usageFactor = (double) (size - 1) / items.length;
+      if (usageFactor < 0.25) {
+        resize(false);
+      }
+      int indexOfLastItem = getIndexOfLastItem();
+      T lastItem = items[indexOfLastItem];
+      items[indexOfLastItem] = null;
+      nextLast = indexOfLastItem;
+      size--;
+      return lastItem;
     }
+    return null;
+  }
 
-    public T removeLast() {
-        if (size > 0) {
-            double usageFactor = (double) (size - 1) / items.length;
-            if (usageFactor < 0.25) {
-                resize(false);
-            }
-            int indexOfLastItem = getIndexOfLastItem();
-            T lastItem = items[indexOfLastItem];
-            items[indexOfLastItem] = null;
-            nextLast = indexOfLastItem;
-            size--;
-            return lastItem;
-        }
-        return null;
+  @Override
+  public T removeFirst() {
+    if (size > 0) {
+      double usageFactor = (double) (size - 1) / items.length;
+      if (usageFactor < 0.25) {
+        resize(false);
+      }
+      int indexOfFirstItem = getIndexOfFirstItem();
+      T firstItem = items[indexOfFirstItem];
+      nextFirst = indexOfFirstItem;
+      size--;
+      return firstItem;
     }
+    return null;
+  }
 
-    public T removeFirst() {
-        if (size > 0) {
-            double usageFactor = (double) (size - 1) / items.length;
-            if (usageFactor < 0.25) {
-                resize(false);
-            }
-            int indexOfFirstItem = getIndexOfFirstItem();
-            T firstItem = items[indexOfFirstItem];
-            nextFirst = indexOfFirstItem;
-            size--;
-            return firstItem;
-        }
-        return null;
+  @Override
+  public T get(int index) {
+    return items[index];
+  }
+
+  @Override
+  public int size() {
+    return this.size;
+  }
+
+  @Override
+  public void printDeque() {
+    int indexForPrinting = getIndexOfFirstItem();
+    for (int i = 0; i < size; i++) {
+      System.out.print(items[indexForPrinting] + " ");
+      if (indexForPrinting + 1 == items.length) {
+        indexForPrinting = 0;
+      } else {
+        indexForPrinting++;
+      }
     }
+    System.out.println();
+  }
 
-    public T get(int index) {
-        return items[index];
-    }
+  private class ArrayDequeIterator implements Iterator<T> {
+    private int pos = 0;
 
-    public boolean isEmpty() {
-        return size <= 0;
-    }
-
-    public int size() {
-        return this.size;
-    }
-
-    public void printDeque() {
-        int indexForPrinting = getIndexOfFirstItem();
-        for (int i = 0; i < size; i++) {
-            System.out.print(items[indexForPrinting] + " ");
-            if (indexForPrinting + 1 == items.length) {
-                indexForPrinting = 0;
-            } else {
-                indexForPrinting++;
-            }
-        }
-        System.out.println();
-    }
-
-    private class ArrayDequeIterator implements Iterator<T> {
-        private int pos = 0;
-
-        @Override
-        public boolean hasNext() {
-            return pos < size;
-        }
-
-        @Override
-        public T next() {
-            T nextItem = get(pos);
-            pos++;
-            return nextItem;
-        }
+    @Override
+    public boolean hasNext() {
+      return pos < size;
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new ArrayDequeIterator();
+    public T next() {
+      T nextItem = get(pos);
+      pos++;
+      return nextItem;
     }
+  }
 
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof ArrayDeque otherAD) {
-            if (this.size != otherAD.size) return false;
-            for (T item : this) {
-                if (!otherAD.contains(item)) return false;
-            }
-            return true;
-        }
-        return false;
-    }
+  @Override
+  public Iterator<T> iterator() {
+    return new ArrayDequeIterator();
+  }
 
-    private boolean contains(T x) {
-        for (T item : this) {
-            if (item.equals(x)) return true;
-        }
-        return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o instanceof ArrayDeque otherAD) {
+      if (this.size != otherAD.size) return false;
+      for (T item : this) {
+        if (!otherAD.contains(item)) return false;
+      }
+      return true;
     }
+    return false;
+  }
+
+  private boolean contains(T x) {
+    for (T item : this) {
+      if (item.equals(x)) return true;
+    }
+    return false;
+  }
+
 }
